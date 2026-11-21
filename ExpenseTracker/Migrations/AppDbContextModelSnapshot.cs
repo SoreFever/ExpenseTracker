@@ -14,12 +14,30 @@ partial class AppDbContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261113171113_InitialCreate";
+    public override string LastMigrationId => "20261121153325_AddCategories";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
         modelBuilder.HasAnnotation("ProductVersion", "11.0.0");
+
+        modelBuilder.Entity("Category", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Name")
+                    .IsUnique();
+
+                b.ToTable("Categories");
+            });
 
         modelBuilder.Entity("Expense", b =>
             {
@@ -30,9 +48,8 @@ partial class AppDbContextModelSnapshot : ModelSnapshot
                 b.Property<decimal>("Amount")
                     .HasColumnType("TEXT");
 
-                b.Property<string>("Category")
-                    .IsRequired()
-                    .HasColumnType("TEXT");
+                b.Property<int>("CategoryId")
+                    .HasColumnType("INTEGER");
 
                 b.Property<DateOnly>("Date")
                     .HasColumnType("TEXT");
@@ -43,7 +60,25 @@ partial class AppDbContextModelSnapshot : ModelSnapshot
 
                 b.HasKey("Id");
 
+                b.HasIndex("CategoryId");
+
                 b.ToTable("Expenses");
+            });
+
+        modelBuilder.Entity("Expense", b =>
+            {
+                b.HasOne("Category", "Category")
+                    .WithMany("Expenses")
+                    .HasForeignKey("CategoryId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Category");
+            });
+
+        modelBuilder.Entity("Category", b =>
+            {
+                b.Navigation("Expenses");
             });
 #pragma warning restore 612, 618
     }
