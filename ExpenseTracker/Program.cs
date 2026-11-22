@@ -4,7 +4,16 @@ using Microsoft.VisualBasic;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=expenses.db"));
 
+builder.Services.AddCors(options =>
+{
+  options.AddPolicy("Frontend", policy => 
+    policy.WithOrigins("http://localhost:5200")
+      .AllowAnyHeader()
+      .AllowAnyMethod());
+});
+
 var app = builder.Build();
+app.UseCors("FrontEnd");
 
 app.MapGet("/", () => "Expense Tracker API is running");
 
