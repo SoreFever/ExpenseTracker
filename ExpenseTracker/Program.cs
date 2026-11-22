@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=expenses.db"));
@@ -13,7 +12,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-app.UseCors("FrontEnd");
+app.UseCors("Frontend");
 
 app.MapGet("/", () => "Expense Tracker API is running");
 
@@ -62,6 +61,9 @@ app.MapPost("/expenses", async (ExpenseInput input, AppDbContext db) =>
 {
   var category = await db.Categories.FindAsync(input.CategoryId);
   var errors = ValidateExpense(input, category);
+
+  if (string.IsNullOrWhiteSpace(input.Description))
+    errors["description"] = ["Description is required."];
   if (errors.Count > 0) return Results.ValidationProblem(errors);
 
   var expense = new Expense
